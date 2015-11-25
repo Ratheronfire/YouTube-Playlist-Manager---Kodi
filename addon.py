@@ -8,6 +8,7 @@ import xbmc
 import os
 from play_videos import *
 from update_existing_uploaders import *
+from find_account_playlists import *
  
 addon = xbmcaddon.Addon()
 addonname = addon.getAddonInfo('name')
@@ -50,6 +51,17 @@ elif mode[0] == "edit":
         uploader_entry = xbmcgui.ListItem(videos_json["uploaders"][uploader]["name"], iconImage="DefaultFolder.png")
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=uploader_url, listitem=uploader_entry, isFolder=True)
     
+    xbmcplugin.endOfDirectory(addon_handle)
+elif mode[0] == "edit_uploader":
+    uploader_id = args.get("uploader", None)[0]
+
+    playlists = get_account_playlists(uploader_id, False)
+
+    for (playlist_title, playlist_id) in playlists.items():
+        playlist_url = make_url({"mode":"edit_playlist","playlist":playlist_id})
+        playlist_entry = xbmcgui.ListItem(playlist_title, iconImage="DefaultFolder.png")
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=playlist_url, listitem=playlist_entry, isFolder=True)
+
     xbmcplugin.endOfDirectory(addon_handle)
 elif mode[0] == "update":
     update_existing_uploaders()
