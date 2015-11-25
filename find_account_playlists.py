@@ -83,6 +83,10 @@ def process_playlists(playlists):
 
 
 def find_account_playlists(input_var, input_is_username):
+    playlists = get_account_playlists(input_var, input_is_username)
+    process_playlists(playlists)
+
+def get_account_playlists(input_var, input_is_username):
     global uploader_id
 
     if input_is_username:
@@ -104,4 +108,5 @@ def find_account_playlists(input_var, input_is_username):
 
     playlists = process_pages(playlists_response_json)
 
-    process_playlists(playlists)
+    return playlists
+
