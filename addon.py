@@ -63,5 +63,35 @@ elif mode[0] == "edit_uploader":
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=playlist_url, listitem=playlist_entry, isFolder=True)
 
     xbmcplugin.endOfDirectory(addon_handle)
+elif mode[0] == "edit_playlist":
+    playlist_id = args.get("playlist", None)[0]
+
+    if not os.access(config["playlist_prefs_path"], os.F_OK):
+        with open(config["playlist_prefs_path"], "w") as data:
+            data.write("{}")
+
+    with open(config["playlist_prefs_path"], "r") as data:
+        playlist_json = json.load(data)
+
+    dialog_string = "Do you want to include this playlist?  It is currently not included."
+    if playlist_id in playlist_json and playlist_json[playlist_id]:
+        dialog_string = "Do you want to include this playlist?  It is currently included."
+
+    playlist_dialog = xbmcgui.Dialog()
+
+    include_decision = playlist_dialog.select(dialog_string, ["Yes", "No", "Remove Preference", "Cancel"])
+
+    if include_decision == 3:
+        exit(0)
+    elif include_decision == 0:
+        playlist_json[playlist_id] = True
+    elif include_decision == 1:
+        playlist_json[playlist_id] = False
+    elif include_decision == 2:
+        del playlist_json[playlist_id]
+
+    with open(config["playlist_prefs_path"], "w") as playlist_prefs:
+        json.dump(playlist_json, playlist_prefs, indent=2)
+
 elif mode[0] == "update":
     update_existing_uploaders()
